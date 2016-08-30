@@ -1,3 +1,12 @@
+'use strict';
+
+/**
+ *
+ * @module polyline
+ */
+
+var polyline = {};
+
 // Code goes here
 
 function lshiftOperator(num, bits) {
@@ -39,7 +48,10 @@ function getDecodedDimensionFromPolyline(polyline, index) {
   }
 }
 
-function decodeTimeAwarePolyline(polyline) {
+/**
+ *
+ */
+polyline.decodeTimeAwarePolyline = function(polyline) {
   // Method to decode a time aware polyline and return gpx logs
   var gpxLogs = [];
   var index = 0;
@@ -81,7 +93,5 @@ function getGpxLog(lat, lng, timeStamp) {
   ];
 }
 
-var polyline = "spxsBsdb|L}_ni~jotAx@T{uJvAr@avJ";
-var decodedPolyline = decodeTimeAwarePolyline(polyline);
-
-
+// var polyline = "spxsBsdb|L}_ni~jotAx@T{uJvAr@avJ";
+// var decodedPolyline = decodeTimeAwarePolyline(polyline);
