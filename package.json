@@ -23,6 +23,7 @@
   "homepage": "https://github.com/hypertrack/time-aware-polyline-js#readme",
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^2.11.12",
     "mocha": "^3.0.2"
   }
 }
