@@ -84,7 +84,8 @@ function getCoordinate(coordinate) {
 }
 
 function getIsoTime(timeStamp) {
-  return new Date(timeStamp).toISOString();
+  // timeStamp is in seconds
+  return new Date(timeStamp * 1000).toISOString();
 }
 
 function getGpxLog(lat, lng, timeStamp) {
