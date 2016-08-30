@@ -4,7 +4,7 @@
   "description": "Time aware polyline encoder and decoder",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "istanbul cover _mocha"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,9 @@
   "homepage": "https://github.com/hypertrack/time-aware-polyline-js#readme",
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.0.2"
+    "coveralls": "^2.11.12",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.0.2",
+    "mocha-lcov-reporter": "^1.2.0"
   }
 }
