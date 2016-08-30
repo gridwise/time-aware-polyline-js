@@ -93,5 +93,4 @@ function getGpxLog(lat, lng, timeStamp) {
   ];
 }
 
-// var polyline = "spxsBsdb|L}_ni~jotAx@T{uJvAr@avJ";
-// var decodedPolyline = decodeTimeAwarePolyline(polyline);
+module.exports = polyline
