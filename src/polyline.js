@@ -10,6 +10,14 @@ var polyline = {};
 
 
 /**
+ * Encodes a time aware polyline
+ */
+polyline.encodeTimeAwarePolyline = function(points) {
+  return extendTimeAwarePolyline("", points, null);
+}
+
+
+/**
  * Decodes a time aware polyline
  */
 polyline.decodeTimeAwarePolyline = function(polyline) {
@@ -41,6 +49,49 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
 }
 
 // Helper methods
+
+function extendTimeAwarePolyline(polyline, points, lastPoint) {
+  var lastLat = 0, lastLng = 0, lastTimeStamp = 0;
+
+  if (polyline == null) {
+    polyline = '';
+  }
+
+  if (lastPoint != null) {
+    lastLat = getLat(lastPoint);
+    lastLng = getLng(lastPoint);
+    lastTimeStamp = getTimeStamp(lastPoint);
+  }
+
+  if (points.length < 1) {
+    return polyline
+  }
+
+  for (var i = 0; i < points.length; i++) {
+    var currentGpxLog = points[i];
+    var lat = getLat(currentGpxLog);
+    var lng = getLng(currentGpxLog);
+    var timeStamp = getTimeStamp(currentGpxLog);
+
+    var diffArray = [lat - lastLat, lng - lastLng, timeStamp - lastTimeStamp];
+
+    for (var j = 0; j < diffArray.length; j++) {
+      var currentDiff = diffArray[j];
+      currentDiff = (currentDiff < 0) ? notOperator(lshiftOperator(currentDiff, 1)) : lshiftOperator(currentDiff, 1);
+
+      while (currentDiff >= 0x20) {
+        polyline += String.fromCharCode((0x20 | (currentDiff & 0x1f)) + 63);
+        currentDiff = rshiftOperator(currentDiff, 5);
+      }
+
+      polyline += String.fromCharCode(currentDiff + 63);
+    }
+
+    lastLat = lat, lastLng = lng, lastTimeStamp = timeStamp;
+  }
+
+  return polyline;
+}
 
 function getDecodedDimensionFromPolyline(polyline, index) {
   // Method to decode one dimension of the polyline
@@ -82,6 +133,19 @@ function getGpxLog(lat, lng, timeStamp) {
   return [
     getCoordinate(lat), getCoordinate(lng), getIsoTime(timeStamp)
   ];
+}
+
+function getLat(gpxLog) {
+  return Math.round(gpxLog[0] * 100000);
+}
+
+function getLng(gpxLog) {
+  return Math.round(gpxLog[1] * 100000);
+}
+
+function getTimeStamp(gpxLog) {
+  return +new Date(gpxLog[2]) / 1000;
+
 }
 
 // Override bit wise operators to circumvent 64 bit int issue

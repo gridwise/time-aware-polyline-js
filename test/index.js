@@ -1,6 +1,7 @@
 var should = require('chai').should(),
     polyline = require('../index'),
-    decoder = polyline.decodeTimeAwarePolyline;
+    decoder = polyline.decodeTimeAwarePolyline,
+    encoder = polyline.encodeTimeAwarePolyline;
 
 var points = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
@@ -13,5 +14,11 @@ var polyline = 'spxsBsdb|Lymo`qvAx@TKvAr@K'
 describe('#decoder', function() {
   it('decodes polyline', function() {
     decoder(polyline).should.deep.equal(points);
+  });
+});
+
+describe('#encoder', function() {
+  it('encodes polyline', function() {
+    encoder(points).should.equal(polyline);
   });
 });
