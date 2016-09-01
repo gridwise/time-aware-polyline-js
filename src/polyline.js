@@ -1,55 +1,16 @@
 'use strict';
 
 /**
+ * Methods for encoding and decoding time aware polylines
  *
  * @module polyline
  */
 
 var polyline = {};
 
-// Code goes here
-
-function lshiftOperator(num, bits) {
-  // Custom left shift for 64 bit integers
-  return num * Math.pow(2, bits);
-}
-
-function rshiftOperator(num, bits) {
-  // Custom right shift for 64 bit integers
-  return Math.floor(num / Math.pow(2, bits));
-}
-
-function notOperator(num) {
-  // Custom not operator for 64 bit integers
-  return ~num;
-}
-
-function getDecodedDimensionFromPolyline(polyline, index) {
-  // Method to decode one dimension of the polyline
-  var result = 1;
-  var shift = 0;
-
-  while (true) {
-    var polylineChar = polyline[index];
-    var b = polylineChar.charCodeAt(0) - 63 - 1;
-    index ++;
-    result += lshiftOperator(b, shift);
-    shift += 5;
-    
-    if (b < 0x1f) {
-      break;
-    }
-  }
-
-  if ((result % 2) !== 0) {
-    return [index, rshiftOperator(notOperator(result), 1)];
-  } else {
-    return [index, rshiftOperator(result, 1)];
-  }
-}
 
 /**
- *
+ * Decodes a time aware polyline
  */
 polyline.decodeTimeAwarePolyline = function(polyline) {
   // Method to decode a time aware polyline and return gpx logs
@@ -79,6 +40,34 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
   return gpxLogs;
 }
 
+// Helper methods
+
+function getDecodedDimensionFromPolyline(polyline, index) {
+  // Method to decode one dimension of the polyline
+  var result = 1;
+  var shift = 0;
+
+  while (true) {
+    var polylineChar = polyline[index];
+    var b = polylineChar.charCodeAt(0) - 63 - 1;
+    index ++;
+    result += lshiftOperator(b, shift);
+    shift += 5;
+
+    if (b < 0x1f) {
+      break;
+    }
+  }
+
+  if ((result % 2) !== 0) {
+    return [index, rshiftOperator(notOperator(result), 1)];
+  } else {
+    return [index, rshiftOperator(result, 1)];
+  }
+}
+
+// Methods to convert types
+
 function getCoordinate(intRepresentation) {
   var coordinate = intRepresentation * 0.00001;
   return +coordinate.toFixed(5);
@@ -94,5 +83,23 @@ function getGpxLog(lat, lng, timeStamp) {
     getCoordinate(lat), getCoordinate(lng), getIsoTime(timeStamp)
   ];
 }
+
+// Override bit wise operators to circumvent 64 bit int issue
+
+function lshiftOperator(num, bits) {
+  // Custom left shift for 64 bit integers
+  return num * Math.pow(2, bits);
+}
+
+function rshiftOperator(num, bits) {
+  // Custom right shift for 64 bit integers
+  return Math.floor(num / Math.pow(2, bits));
+}
+
+function notOperator(num) {
+  // Custom not operator for 64 bit integers
+  return ~num;
+}
+
 
 module.exports = polyline
