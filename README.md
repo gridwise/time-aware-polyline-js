@@ -1,7 +1,7 @@
 # Time aware polylines in javascript
 The google encoded [polyline algorithm](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) converts location coordinates into an ascii string. We have extended the algorithm to convert location coordinates with time stamps into ascii strings. The time aware polyline is also available in [python](https://github.com/hypertrack/time-aware-polyline-py).
 
-[![Build Status](https://travis-ci.org/hypertrack/time-aware-polyline-js.svg?branch=master)](https://travis-ci.org/hypertrack/time-aware-polyline-js) [![Coverage Status](https://coveralls.io/repos/github/hypertrack/time-aware-polyline-js/badge.svg?branch=master)](https://coveralls.io/github/hypertrack/time-aware-polyline-js?branch=master)
+[![npm version](https://badge.fury.io/js/time-aware-polyline.svg)](https://badge.fury.io/js/time-aware-polyline) [![Build Status](https://travis-ci.org/hypertrack/time-aware-polyline-js.svg?branch=master)](https://travis-ci.org/hypertrack/time-aware-polyline-js) [![Coverage Status](https://coveralls.io/repos/github/hypertrack/time-aware-polyline-js/badge.svg?branch=master)](https://coveralls.io/github/hypertrack/time-aware-polyline-js?branch=master)
 
 Time aware polylines can be used to mark time events on polylines, or run a trip replay, like in the [HyperTrack dashboard](https://dashboard.hypertrack.io/demo).
 
@@ -31,4 +31,11 @@ var polylineUtil = require('time-aware-polyline');
 
 var polyline = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
 polylineUtil.decodeTimeAwarePolyline(polyline);
+```
+
+## Testing
+To run the tests, you will need to install npm. Use the following command to run the tests.
+
+```
+npm test
 ```
