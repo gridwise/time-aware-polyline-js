@@ -79,8 +79,9 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
   return gpxLogs;
 }
 
-function getCoordinate(coordinate) {
-  return coordinate * 0.00001;
+function getCoordinate(intRepresentation) {
+  var coordinate = intRepresentation * 0.00001;
+  return +coordinate.toFixed(5);
 }
 
 function getIsoTime(timeStamp) {
