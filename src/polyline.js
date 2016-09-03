@@ -48,6 +48,47 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
   return gpxLogs;
 }
 
+/**
+ * Decodes a time aware polyline to get locations at given timestamps
+ */
+polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
+  var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
+  console.log(decoded);
+  timeStamps = timeStamps.sort()
+  // decoded and timeStamps are both in order of times
+
+  var locations = [];
+
+  var index = 0;
+  var currentPair = [];
+
+  for (index = 0; index < decoded.length && timeStamps.length > 0; index++) {
+    currentPair.push(decoded[index]);
+
+    if (currentPair.length == 2) {
+      var timeStampToFind = timeStamps[0];
+
+      var startTime = currentPair[0][2],
+          endTime = currentPair[1][2];
+
+      if (timeStampToFind >= startTime && timeStampToFind <= endTime) {
+        // location is in the current pair
+        locations.push(getLocationInPair(currentPair, timeStampToFind));
+        timeStamps.shift();
+
+        // it is possible that the next timestamp is also in the
+        // same pair, hence redo-ing same iteration
+        currentPair.pop();
+        index --;
+      } else {
+        currentPair.shift();
+      }
+    }
+  }
+
+  return locations;
+}
+
 // Helper methods
 
 function extendTimeAwarePolyline(polyline, points, lastPoint) {
@@ -115,6 +156,20 @@ function getDecodedDimensionFromPolyline(polyline, index) {
   } else {
     return [index, rshiftOperator(result, 1)];
   }
+}
+
+function getLocationInPair(gpxPair, timeStamp) {
+  // timeStamp lies between the timeStamps in the gpx logs
+  var startLat = gpxPair[0][0],
+      startLng = gpxPair[0][1],
+      endLat = gpxPair[1][0],
+      endLng = gpxPair[1][1],
+      startTime = new Date(gpxPair[0][2]),
+      endTime = new Date(gpxPair[1][2]),
+      currentTime = new Date(timeStamp);
+  var ratio = (startTime - currentTime) / (startTime - endTime);
+  return [startLat * (1 - ratio) + endLat * ratio,
+          startLng * (1 - ratio) + endLng * ratio];
 }
 
 // Methods to convert types
