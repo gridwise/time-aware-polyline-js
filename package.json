@@ -1,6 +1,6 @@
 {
   "name": "time-aware-polyline",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Time aware polyline encoder and decoder",
   "main": "index.js",
   "scripts": {

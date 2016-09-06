@@ -53,50 +53,10 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
  */
 polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
   var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
-  timeStamps = timeStamps.sort()
-  // decoded and timeStamps are both in order of times
+  var index = 0, locations = [];
 
-  var locations = [];
-
-  var index = 0;
-  var currentPair = [];
-
-  // remove times before first time
-  var timeStampToFind = timeStamps[0],
-      startTime = decoded[0][2];
-  while (timeStampToFind <= startTime) {
-    locations.push([decoded[0][0], decoded[0][1]])
-    timeStamps.shift();
-    timeStampToFind = timeStamps[0];
-  }
-
-  for (index = 0; index < decoded.length && timeStamps.length > 0; index++) {
-    currentPair.push(decoded[index]);
-
-    if (currentPair.length == 2) {
-      var timeStampToFind = timeStamps[0];
-
-      var startTime = currentPair[0][2],
-          endTime = currentPair[1][2];
-
-      if (timeStampToFind >= startTime && timeStampToFind <= endTime) {
-        // location is in the current pair
-        locations.push(getLocationInPair(currentPair, timeStampToFind));
-        timeStamps.shift();
-
-        // it is possible that the next timestamp is also in the
-        // same pair, hence redo-ing same iteration
-        currentPair.pop();
-        index --;
-      } else {
-        currentPair.shift();
-      }
-    }
-  }
-
-  while (timeStamps.length > 0) {
-    locations.push([decoded[index-1][0], decoded[index-1][1]]);
-    timeStamps.shift();
+  for (index = 0; index < timeStamps.length; index++) {
+    locations.push(getLocationAtTimeStamp(decoded, timeStamps[index]));
   }
 
   return locations;
@@ -169,6 +129,46 @@ function getDecodedDimensionFromPolyline(polyline, index) {
   } else {
     return [index, rshiftOperator(result, 1)];
   }
+}
+
+function getLocationAtTimeStamp(decodedPolyline, timeStamp) {
+  var decoded = decodedPolyline;
+  // decoded and timeStamps are both in order of times
+
+  var index = 0;
+  var currentPair = [];
+
+  // remove times before first time
+  var timeStampToFind = timeStamp,
+      startTime = decoded[0][2];
+  while (timeStampToFind <= startTime) {
+    return [decoded[0][0], decoded[0][1]];
+  }
+
+  for (index = 0; index < decoded.length; index++) {
+    currentPair.push(decoded[index]);
+
+    if (currentPair.length == 2) {
+      var timeStampToFind = timeStamp;
+
+      var startTime = currentPair[0][2],
+          endTime = currentPair[1][2];
+
+      if (timeStampToFind >= startTime && timeStampToFind <= endTime) {
+        // location is in the current pair
+        return getLocationInPair(currentPair, timeStampToFind);
+
+        // it is possible that the next timestamp is also in the
+        // same pair, hence redo-ing same iteration
+        currentPair.pop();
+        index --;
+      } else {
+        currentPair.shift();
+      }
+    }
+  }
+
+  return [decoded[index-1][0], decoded[index-1][1]];
 }
 
 function getLocationInPair(gpxPair, timeStamp) {
