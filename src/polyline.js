@@ -53,7 +53,6 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
  */
 polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
   var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
-  console.log(decoded);
   timeStamps = timeStamps.sort()
   // decoded and timeStamps are both in order of times
 
@@ -61,6 +60,15 @@ polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
 
   var index = 0;
   var currentPair = [];
+
+  // remove times before first time
+  var timeStampToFind = timeStamps[0],
+      startTime = decoded[0][2];
+  while (timeStampToFind <= startTime) {
+    locations.push([decoded[0][0], decoded[0][1]])
+    timeStamps.shift();
+    timeStampToFind = timeStamps[0];
+  }
 
   for (index = 0; index < decoded.length && timeStamps.length > 0; index++) {
     currentPair.push(decoded[index]);
@@ -84,6 +92,11 @@ polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
         currentPair.shift();
       }
     }
+  }
+
+  while (timeStamps.length > 0) {
+    locations.push([decoded[index-1][0], decoded[index-1][1]]);
+    timeStamps.shift();
   }
 
   return locations;
