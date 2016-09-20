@@ -156,8 +156,6 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
 
   for (index = 0; index < decoded.length; index++) {
     currentPair.push(decoded[index]);
-    locationsElapsed.push([decoded[index][0],
-                           decoded[index][1]]);
 
     if (currentPair.length == 2) {
       var timeStampToFind = timeStamp;
@@ -168,14 +166,7 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
       if (timeStampToFind >= startTime && timeStampToFind <= endTime) {
         // location is in the current pair
         var midLocation = getLocationInPair(currentPair, timeStampToFind);
-        var endLocation = [currentPair[1][0], currentPair[1][1]];
-
-        if (midLocation[0] != endLocation[0] || midLocation[1] != endLocation[1]) {
-          // only if the new mid point location is different from end location
-          // add it, because end location has been added
-          locationsElapsed.push(midLocation);
-        }
-
+        locationsElapsed.push(midLocation);
         return locationsElapsed;
 
         // it is possible that the next timestamp is also in the
@@ -186,6 +177,9 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
         currentPair.shift();
       }
     }
+
+    locationsElapsed.push([currentPair[0][0],
+                           currentPair[0][1]]);
   }
 
   return [[decoded[index-1][0], decoded[index-1][1]]];

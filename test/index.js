@@ -3,19 +3,13 @@ var should = require('chai').should(),
     decoder = polyline.decodeTimeAwarePolyline,
     encoder = polyline.encodeTimeAwarePolyline,
     locationFinder = polyline.getLocationsAtTimestamps,
-    locationsElapsed = polyline.getLocationsElapsedByTimestamp;
+    getLocationsElapsed = polyline.getLocationsElapsedByTimestamp;
 
 var points = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
     [19.13597, 72.92495, '2016-07-21T05:43:15.000Z'],
     [19.13553, 72.92469, '2016-07-21T05:43:21.000Z']
 ];
-
-var pointsLocations = [];
-
-for (var i = 0; i < points.length; i++) {
-  pointsLocations.push([points[i][0], points[i][1]]);
-}
 
 var encoded = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
 
@@ -33,6 +27,20 @@ var locationsFound = [
     [19.13626, 72.92506],
 ];
 
+var timeStampToFind1 = timeStampsToFind[1];
+var timeStampToFind2 = timeStampsToFind[0];
+
+var locationsElapsed1 = [
+    [19.13626, 72.92506],
+    [19.136163333333336, 72.92502333333334]
+];
+
+var locationsElapsed2 = [
+    [19.13626, 72.92506],
+    [19.13597, 72.92495],
+    [19.13553, 72.92469]
+];
+
 describe('#decoder', function() {
   it('decodes polyline', function() {
     decoder(encoded).should.deep.equal(points);
@@ -45,9 +53,13 @@ describe('#decoder', function() {
   });
 
   it('locations traveled', function() {
-    locationsElapsed(
-      points, timeStampsToFind[0]
-    ).should.deep.equal(pointsLocations);
+    getLocationsElapsed(
+      points, timeStampToFind1
+    ).should.deep.equal(locationsElapsed1);
+
+    getLocationsElapsed(
+      points, timeStampToFind2
+    ).should.deep.equal(locationsElapsed2);
   });
 });
 
