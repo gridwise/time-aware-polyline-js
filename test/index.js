@@ -46,7 +46,7 @@ describe('#decoder', function() {
 
   it('locations traveled', function() {
     locationsElapsed(
-      encoded, timeStampsToFind[0]
+      points, timeStampsToFind[0]
     ).should.deep.equal(pointsLocations);
   });
 });
