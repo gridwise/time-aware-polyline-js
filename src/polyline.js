@@ -16,7 +16,6 @@ polyline.encodeTimeAwarePolyline = function(points) {
   return extendTimeAwarePolyline("", points, null);
 }
 
-
 /**
  * Decodes a time aware polyline
  */
@@ -56,10 +55,20 @@ polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
   var index = 0, locations = [];
 
   for (index = 0; index < timeStamps.length; index++) {
-    locations.push(getLocationAtTimeStamp(decoded, timeStamps[index]));
+    var locationsFound = getLocationsTillTimeStamp(decoded, timeStamps[index]);
+    locations.push(locationsFound[locationsFound.length - 1]);
   }
 
   return locations;
+}
+
+/**
+ * Decodes a time aware polyline to get locations traveled till a timestamp
+ * to build a live polyline
+ */
+polyline.getLocationsElapsedByTimestamp = function(timeAwarePolyline, timeStamp) {
+  var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
+  return getLocationsTillTimeStamp(decoded, timeStamp);
 }
 
 // Helper methods
@@ -131,22 +140,25 @@ function getDecodedDimensionFromPolyline(polyline, index) {
   }
 }
 
-function getLocationAtTimeStamp(decodedPolyline, timeStamp) {
+function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
   var decoded = decodedPolyline;
   // decoded and timeStamps are both in order of times
 
   var index = 0;
   var currentPair = [];
+  var locationsElapsed = [];
 
   // remove times before first time
   var timeStampToFind = timeStamp,
       startTime = decoded[0][2];
   while (timeStampToFind <= startTime) {
-    return [decoded[0][0], decoded[0][1]];
+    return [[decoded[0][0], decoded[0][1]]];
   }
 
   for (index = 0; index < decoded.length; index++) {
     currentPair.push(decoded[index]);
+    locationsElapsed.push([decoded[index][0],
+                           decoded[index][1]]);
 
     if (currentPair.length == 2) {
       var timeStampToFind = timeStamp;
@@ -156,7 +168,16 @@ function getLocationAtTimeStamp(decodedPolyline, timeStamp) {
 
       if (timeStampToFind >= startTime && timeStampToFind <= endTime) {
         // location is in the current pair
-        return getLocationInPair(currentPair, timeStampToFind);
+        var midLocation = getLocationInPair(currentPair, timeStampToFind);
+        var endLocation = [currentPair[1][0], currentPair[1][1]];
+
+        if (midLocation[0] != endLocation[0] || midLocation[1] != endLocation[1]) {
+          // only if the new mid point location is different from end location
+          // add it, because end location has been added
+          locationsElapsed.push(midLocation);
+        }
+
+        return locationsElapsed;
 
         // it is possible that the next timestamp is also in the
         // same pair, hence redo-ing same iteration
@@ -168,7 +189,7 @@ function getLocationAtTimeStamp(decodedPolyline, timeStamp) {
     }
   }
 
-  return [decoded[index-1][0], decoded[index-1][1]];
+  return [[decoded[index-1][0], decoded[index-1][1]]];
 }
 
 function getLocationInPair(gpxPair, timeStamp) {
