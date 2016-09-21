@@ -67,7 +67,7 @@ polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
  * to build a live polyline
  */
 polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, timeStamp) {
-  return getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
+  return {'path': getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp)};
 }
 
 // Helper methods
