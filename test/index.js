@@ -56,13 +56,13 @@ describe('#decoder', function() {
     getLocationsElapsed(
       points, timeStampToFind1
     ).should.deep.equal(
-      {'path': locationsElapsed1}
+      {'path': locationsElapsed1, 'bearing': -160.2848117989358}
     );
 
     getLocationsElapsed(
       points, timeStampToFind2
     ).should.deep.equal(
-      {'path': locationsElapsed2}
+      {'path': locationsElapsed2, 'bearing': 0}
     );
   });
 });
