@@ -67,7 +67,11 @@ polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
  * to build a live polyline
  */
 polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, timeStamp) {
-  return getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
+  var path = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
+  var currentLatLng = path[path.length - 1];
+  var nextLatLng = getNextLatLng(decodedTimeAwarePolyline, timeStamp);
+  return {'path': path,
+          'bearing': computeHeading(currentLatLng, nextLatLng)};
 }
 
 // Helper methods
@@ -197,6 +201,30 @@ function getLocationInPair(gpxPair, timeStamp) {
   var ratio = (startTime - currentTime) / (startTime - endTime);
   return [startLat * (1 - ratio) + endLat * ratio,
           startLng * (1 - ratio) + endLng * ratio];
+}
+
+function getNextLatLng(decoded, timeStamp) {
+  var polylineLength = decoded.length;
+
+  if (polylineLength > 0) {
+    for (var index = 0; index < polylineLength - 1; index++) {
+      var currentTimeStamp = decoded[index][2];
+
+      if (timeStamp < currentTimeStamp) {
+        return [decoded[index][0], decoded[index][1]];
+      }
+    }
+
+    return [decoded[polylineLength - 1][0], decoded[polylineLength - 1][1]];
+  }
+}
+
+function computeHeading(start, end) {
+  var lat1 = start[0]*Math.PI/180;
+  var lat2 = end[0]*Math.PI/180;
+  var lng1 = start[1]*Math.PI/180;
+  var lng2 = end[1]*Math.PI/180;
+  return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
 }
 
 // Methods to convert types

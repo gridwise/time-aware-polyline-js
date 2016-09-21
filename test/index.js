@@ -55,11 +55,15 @@ describe('#decoder', function() {
   it('locations traveled', function() {
     getLocationsElapsed(
       points, timeStampToFind1
-    ).should.deep.equal(locationsElapsed1);
+    ).should.deep.equal(
+      {'path': locationsElapsed1, 'bearing': -160.2848117989358}
+    );
 
     getLocationsElapsed(
       points, timeStampToFind2
-    ).should.deep.equal(locationsElapsed2);
+    ).should.deep.equal(
+      {'path': locationsElapsed2, 'bearing': 0}
+    );
   });
 });
 
