@@ -51,7 +51,12 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
  * Decodes a time aware polyline to get locations at given timestamps
  */
 polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
-  var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
+  var decoded;
+  if(typeOf timeAwarePolyline == 'string') {
+    decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
+  } else {
+    decoded = timeAwarePolyline;
+  }
   var index = 0, locations = [];
 
   for (index = 0; index < timeStamps.length; index++) {
