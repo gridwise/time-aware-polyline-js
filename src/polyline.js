@@ -70,12 +70,18 @@ polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, tim
   var currentLatLng = path[path.length - 1];
   var nextLatLng = getNextLatLng(decodedTimeAwarePolyline, timeStamp);
 
-  if (nextLatLng[0] == currentLatLng[0] && nextLatLng[1] == currentLatLng[1]) {
+  if (areEqualLatlngs(nextLatLng, currentLatLng)) {
     // the next latlng is the same, and so bearing will be 0
     nextLatLng = currentLatLng;
 
     if (path.length >= 2) {
-      currentLatLng = path[path.length - 2];
+      var index = path.length - 2;
+      for (; index >= 0; index --) {
+        if (!areEqualLatlngs(path[index], currentLatLng)) {
+          currentLatLng = path[index];
+          break;
+        }
+      }
     }
   }
 
@@ -234,6 +240,10 @@ function computeHeading(start, end) {
   var lng1 = start[1]*Math.PI/180;
   var lng2 = end[1]*Math.PI/180;
   return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
+}
+
+function areEqualLatlngs(latlngA, latlngB) {
+  return (latlngA[0] == latlngB[0]) && (latlngA[1] == latlngB[1]);
 }
 
 // Methods to convert types
