@@ -48,7 +48,7 @@ describe('#decoder', function() {
 
   it('finds locations', function() {
     locationFinder(
-      encoded, timeStampsToFind
+      points, timeStampsToFind
     ).should.deep.equal(locationsFound);
   });
 

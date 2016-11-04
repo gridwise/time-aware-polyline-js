@@ -48,14 +48,13 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
 }
 
 /**
- * Decodes a time aware polyline to get locations at given timestamps
+ * Get locations for a list of timestamps from a decoded polyline
  */
-polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
-  var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
+polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamps) {
   var index = 0, locations = [];
 
   for (index = 0; index < timeStamps.length; index++) {
-    var locationsFound = getLocationsTillTimeStamp(decoded, timeStamps[index]);
+    var locationsFound = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamps[index]);
     locations.push(locationsFound[locationsFound.length - 1]);
   }
 
