@@ -69,6 +69,16 @@ polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, tim
   var path = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
   var currentLatLng = path[path.length - 1];
   var nextLatLng = getNextLatLng(decodedTimeAwarePolyline, timeStamp);
+
+  if (nextLatLng[0] == currentLatLng[0] && nextLatLng[1] == currentLatLng[1]) {
+    // the next latlng is the same, and so bearing will be 0
+    nextLatLng = currentLatLng;
+
+    if (path.length >= 2) {
+      currentLatLng = path[path.length - 2];
+    }
+  }
+
   return {'path': path,
           'bearing': computeHeading(currentLatLng, nextLatLng)};
 }

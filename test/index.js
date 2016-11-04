@@ -62,7 +62,7 @@ describe('#decoder', function() {
     getLocationsElapsed(
       points, timeStampToFind2
     ).should.deep.equal(
-      {'path': locationsElapsed2, 'bearing': 0}
+      {'path': locationsElapsed2, 'bearing': -150.82716244793204}
     );
   });
 });
