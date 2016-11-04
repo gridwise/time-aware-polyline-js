@@ -9,11 +9,11 @@ Time aware polylines can be used to mark time events on polylines, or run a trip
 
 ## Install
 ```
-npm i time-aware-polyline
+$ npm i time-aware-polyline
 ```
 
 ## Encoder
-```
+```javascript
 var polylineUtil = require('time-aware-polyline');
 
 var points = [
@@ -26,7 +26,7 @@ polylineUtil.encodeTimeAwarePolyline(points);
 
 ## Decoder
 
-```
+```javascript
 var polylineUtil = require('time-aware-polyline');
 
 var polyline = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
@@ -37,5 +37,5 @@ polylineUtil.decodeTimeAwarePolyline(polyline);
 To run the tests, you will need to install npm. Use the following command to run the tests.
 
 ```
-npm test
+$ npm test
 ```

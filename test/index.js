@@ -11,6 +11,14 @@ var points = [
     [19.13553, 72.92469, '2016-07-21T05:43:21.000Z']
 ];
 
+var pointsWithDuplicates = [
+    [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
+    [19.13597, 72.92495, '2016-07-21T05:43:15.000Z'],
+    [19.13553, 72.92469, '2016-07-21T05:43:21.000Z'],
+    [19.13553, 72.92469, '2016-07-21T05:43:22.000Z'],
+    [19.13553, 72.92469, '2016-07-21T05:43:23.000Z']
+];
+
 var encoded = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
 
 var timeStampsToFind = [
@@ -41,6 +49,16 @@ var locationsElapsed2 = [
     [19.13553, 72.92469]
 ];
 
+var locationsElapsedWithDuplicates = [
+    [19.13626, 72.92506],
+    [19.13597, 72.92495],
+    [19.13553, 72.92469],
+    [19.13553, 72.92469],
+    [19.13553, 72.92469]
+];
+
+var timeStampForDuplicates = '2016-07-21T05:43:23.000Z';
+
 describe('#decoder', function() {
   it('decodes polyline', function() {
     decoder(encoded).should.deep.equal(points);
@@ -48,7 +66,7 @@ describe('#decoder', function() {
 
   it('finds locations', function() {
     locationFinder(
-      encoded, timeStampsToFind
+      points, timeStampsToFind
     ).should.deep.equal(locationsFound);
   });
 
@@ -62,7 +80,13 @@ describe('#decoder', function() {
     getLocationsElapsed(
       points, timeStampToFind2
     ).should.deep.equal(
-      {'path': locationsElapsed2, 'bearing': 0}
+      {'path': locationsElapsed2, 'bearing': -150.82716244793204}
+    );
+
+    getLocationsElapsed(
+      pointsWithDuplicates, timeStampForDuplicates
+    ).should.deep.equal(
+      {'path': locationsElapsedWithDuplicates, 'bearing': -150.82716244793204}
     );
   });
 });

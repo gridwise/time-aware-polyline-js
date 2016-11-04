@@ -48,14 +48,13 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
 }
 
 /**
- * Decodes a time aware polyline to get locations at given timestamps
+ * Get locations for a list of timestamps from a decoded polyline
  */
-polyline.getLocationsAtTimestamps = function(timeAwarePolyline, timeStamps) {
-  var decoded = polyline.decodeTimeAwarePolyline(timeAwarePolyline);
+polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamps) {
   var index = 0, locations = [];
 
   for (index = 0; index < timeStamps.length; index++) {
-    var locationsFound = getLocationsTillTimeStamp(decoded, timeStamps[index]);
+    var locationsFound = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamps[index]);
     locations.push(locationsFound[locationsFound.length - 1]);
   }
 
@@ -70,6 +69,22 @@ polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, tim
   var path = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
   var currentLatLng = path[path.length - 1];
   var nextLatLng = getNextLatLng(decodedTimeAwarePolyline, timeStamp);
+
+  if (areEqualLatlngs(nextLatLng, currentLatLng)) {
+    // the next latlng is the same, and so bearing will be 0
+    nextLatLng = currentLatLng;
+
+    if (path.length >= 2) {
+      var index = path.length - 2;
+      for (; index >= 0; index --) {
+        if (!areEqualLatlngs(path[index], currentLatLng)) {
+          currentLatLng = path[index];
+          break;
+        }
+      }
+    }
+  }
+
   return {'path': path,
           'bearing': computeHeading(currentLatLng, nextLatLng)};
 }
@@ -225,6 +240,10 @@ function computeHeading(start, end) {
   var lng1 = start[1]*Math.PI/180;
   var lng2 = end[1]*Math.PI/180;
   return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
+}
+
+function areEqualLatlngs(latlngA, latlngB) {
+  return (latlngA[0] == latlngB[0]) && (latlngA[1] == latlngB[1]);
 }
 
 // Methods to convert types
