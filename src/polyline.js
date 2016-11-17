@@ -27,7 +27,7 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
   var lng = 0;
   var timeStamp = 0;
   var polylineLine = polyline.length;
-  
+
   while (index < polylineLine) {
     // Decoding dimensions one by one
     var latResult = getDecodedDimensionFromPolyline(polyline, index);
@@ -36,14 +36,14 @@ polyline.decodeTimeAwarePolyline = function(polyline) {
     index = lngResult[0];
     var timeResult = getDecodedDimensionFromPolyline(polyline, index);
     index = timeResult[0];
-    
+
     // Resultant variables
     lat += latResult[1];
     lng += lngResult[1];
     timeStamp += timeResult[1];
     gpxLogs.push(getGpxLog(lat, lng, timeStamp));
   }
-  
+
   return gpxLogs;
 }
 
@@ -54,7 +54,9 @@ polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamp
   var index = 0, locations = [];
 
   for (index = 0; index < timeStamps.length; index++) {
-    var locationsFound = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamps[index]);
+    var locationsAndBearing = getLocationsTillTimeStamp(
+      decodedTimeAwarePolyline, timeStamps[index]);
+    var locationsFound = locationsAndBearing.locations;
     locations.push(locationsFound[locationsFound.length - 1]);
   }
 
@@ -66,27 +68,10 @@ polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamp
  * to build a live polyline
  */
 polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, timeStamp) {
-  var path = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
-  var currentLatLng = path[path.length - 1];
-  var nextLatLng = getNextLatLng(decodedTimeAwarePolyline, timeStamp);
+  var locationsAndBearing = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
 
-  if (areEqualLatlngs(nextLatLng, currentLatLng)) {
-    // the next latlng is the same, and so bearing will be 0
-    nextLatLng = currentLatLng;
-
-    if (path.length >= 2) {
-      var index = path.length - 2;
-      for (; index >= 0; index --) {
-        if (!areEqualLatlngs(path[index], currentLatLng)) {
-          currentLatLng = path[index];
-          break;
-        }
-      }
-    }
-  }
-
-  return {'path': path,
-          'bearing': computeHeading(currentLatLng, nextLatLng)};
+  return {'path': locationsAndBearing.locations,
+          'bearing': locationsAndBearing.bearing};
 }
 
 // Helper methods
@@ -165,12 +150,14 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
   var index = 0;
   var currentPair = [];
   var locationsElapsed = [];
+  var bearing = 0;
 
   // remove times before first time
   var timeStampToFind = timeStamp,
       startTime = decoded[0][2];
   while (timeStampToFind <= startTime) {
-    return [[decoded[0][0], decoded[0][1]]];
+    return {'locations': [[decoded[0][0], decoded[0][1]]],
+            'bearing': bearing};
   }
 
   for (index = 0; index < decoded.length; index++) {
@@ -178,6 +165,7 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
 
     if (currentPair.length == 2) {
       var timeStampToFind = timeStamp;
+      bearing = updateBearing(bearing, currentPair)
 
       var startTime = currentPair[0][2],
           endTime = currentPair[1][2];
@@ -186,7 +174,7 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
         // location is in the current pair
         var midLocation = getLocationInPair(currentPair, timeStampToFind);
         locationsElapsed.push(midLocation);
-        return locationsElapsed;
+        return {'locations': locationsElapsed, 'bearing': bearing};
 
         // it is possible that the next timestamp is also in the
         // same pair, hence redo-ing same iteration
@@ -201,7 +189,20 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
                            currentPair[0][1]]);
   }
 
-  return [[decoded[index-1][0], decoded[index-1][1]]];
+  return {'locations': [[decoded[index-1][0], decoded[index-1][1]]],
+          'bearing': bearing};
+}
+
+function updateBearing(oldBearing, gpxPair) {
+  var start = [gpxPair[0][0], gpxPair[0][1]];
+  var end = [gpxPair[1][0], gpxPair[1][1]];
+  var newBearing = computeHeading(start, end);
+
+  if (newBearing != 0) {
+    return Math.round(newBearing * 100) / 100.0;
+  } else {
+    return oldBearing;
+  }
 }
 
 function getLocationInPair(gpxPair, timeStamp) {

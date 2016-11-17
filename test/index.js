@@ -74,19 +74,19 @@ describe('#decoder', function() {
     getLocationsElapsed(
       points, timeStampToFind1
     ).should.deep.equal(
-      {'path': locationsElapsed1, 'bearing': -160.2848117989358}
+      {'path': locationsElapsed1, 'bearing': -160.28}
     );
 
     getLocationsElapsed(
       points, timeStampToFind2
     ).should.deep.equal(
-      {'path': locationsElapsed2, 'bearing': -150.82716244793204}
+      {'path': locationsElapsed2, 'bearing': -150.83}
     );
 
     getLocationsElapsed(
       pointsWithDuplicates, timeStampForDuplicates
     ).should.deep.equal(
-      {'path': locationsElapsedWithDuplicates, 'bearing': -150.82716244793204}
+      {'path': locationsElapsedWithDuplicates, 'bearing': -150.83}
     );
   });
 });
