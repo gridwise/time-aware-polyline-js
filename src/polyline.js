@@ -68,27 +68,10 @@ polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamp
  * to build a live polyline
  */
 polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, timeStamp) {
-  var path = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp).locations;
-  var currentLatLng = path[path.length - 1];
-  var nextLatLng = getNextLatLng(decodedTimeAwarePolyline, timeStamp);
+  var locationsAndBearing = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
 
-  if (areEqualLatlngs(nextLatLng, currentLatLng)) {
-    // the next latlng is the same, and so bearing will be 0
-    nextLatLng = currentLatLng;
-
-    if (path.length >= 2) {
-      var index = path.length - 2;
-      for (; index >= 0; index --) {
-        if (!areEqualLatlngs(path[index], currentLatLng)) {
-          currentLatLng = path[index];
-          break;
-        }
-      }
-    }
-  }
-
-  return {'path': path,
-          'bearing': computeHeading(currentLatLng, nextLatLng)};
+  return {'path': locationsAndBearing.locations,
+          'bearing': locationsAndBearing.bearing};
 }
 
 // Helper methods
@@ -182,6 +165,7 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
 
     if (currentPair.length == 2) {
       var timeStampToFind = timeStamp;
+      bearing = updateBearing(bearing, currentPair)
 
       var startTime = currentPair[0][2],
           endTime = currentPair[1][2];
@@ -207,6 +191,18 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
 
   return {'locations': [[decoded[index-1][0], decoded[index-1][1]]],
           'bearing': bearing};
+}
+
+function updateBearing(oldBearing, gpxPair) {
+  var start = [gpxPair[0][0], gpxPair[0][1]];
+  var end = [gpxPair[1][0], gpxPair[1][1]];
+  var newBearing = computeHeading(start, end);
+
+  if (newBearing != 0) {
+    return newBearing;
+  } else {
+    return oldBearing;
+  }
 }
 
 function getLocationInPair(gpxPair, timeStamp) {
