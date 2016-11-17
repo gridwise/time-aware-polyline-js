@@ -199,7 +199,7 @@ function updateBearing(oldBearing, gpxPair) {
   var newBearing = computeHeading(start, end);
 
   if (newBearing != 0) {
-    return newBearing;
+    return Math.round(newBearing * 100) / 100.0;
   } else {
     return oldBearing;
   }
