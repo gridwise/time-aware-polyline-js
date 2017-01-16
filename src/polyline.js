@@ -69,10 +69,18 @@ polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamp
 polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, timeStamp) {
     var locationsAndBearing = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
 
-    return {'path': locationsAndBearing.locations,
-    'bearing': locationsAndBearing.bearing};
+    return {'path': locationsAndBearing.locations, 'bearing': locationsAndBearing.bearing};
 }
 
+
+
+/**
+* Decode a polyline into segments of contiguous location data, which are solid,
+* and gaps, which are dotted.
+*/
+polyline.getPolylineSegments = function(polyline) {
+    return {'path': [], 'bearing': null};
+}
 
 
 // Helper methods
