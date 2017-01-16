@@ -232,14 +232,22 @@ function getPolylineSegments(decoded, timeLimit) {
 
             if (timeDiff > 10 * 60 * 1000 && currentSegment.length > 0) {
                 // time difference is more than 10 mins, so flush
-                currentSegment.push(decoded[index]);
+                segments.push({
+                    'segment': currentSegment, 'style': 'solid'
+                });
+
+                var lastElement = currentSegment[currentSegment.length-1];
+                currentSegment = [lastElement, decoded[index]];
+
                 segments.push({
                     'segment': currentSegment, 'style': 'dotted'
                 });
-                currentSegment = [];
+
+                currentSegment = [decoded[index]];
+            } else {
+                currentSegment.push(decoded[index]);
             }
 
-            currentSegment.push(decoded[index])
             startTime = indexTime;
         } else {
             break;
