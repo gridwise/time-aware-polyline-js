@@ -1,9 +1,10 @@
 var should = require('chai').should(),
-    polyline = require('../index'),
-    decoder = polyline.decodeTimeAwarePolyline,
-    encoder = polyline.encodeTimeAwarePolyline,
-    locationFinder = polyline.getLocationsAtTimestamps,
-    getLocationsElapsed = polyline.getLocationsElapsedByTimestamp;
+polyline = require('../index'),
+decoder = polyline.decodeTimeAwarePolyline,
+encoder = polyline.encodeTimeAwarePolyline,
+locationFinder = polyline.getLocationsAtTimestamps,
+getLocationsElapsed = polyline.getLocationsElapsedByTimestamp,
+getPolylineSegments = polyline.getPolylineSegments;
 
 var points = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
@@ -60,39 +61,47 @@ var locationsElapsedWithDuplicates = [
 var timeStampForDuplicates = '2016-07-21T05:43:23.000Z';
 
 describe('#decoder', function() {
-  it('decodes polyline', function() {
-    decoder(encoded).should.deep.equal(points);
-  });
+    it('decodes polyline', function() {
+        decoder(encoded).should.deep.equal(points);
+    });
 
-  it('finds locations', function() {
-    locationFinder(
-      points, timeStampsToFind
-    ).should.deep.equal(locationsFound);
-  });
+    it('finds locations', function() {
+        locationFinder(
+            points, timeStampsToFind
+        ).should.deep.equal(locationsFound);
+    });
 
-  it('locations traveled', function() {
-    getLocationsElapsed(
-      points, timeStampToFind1
-    ).should.deep.equal(
-      {'path': locationsElapsed1, 'bearing': -160.28}
-    );
+    it('locations traveled', function() {
+        getLocationsElapsed(
+            points, timeStampToFind1
+        ).should.deep.equal(
+            {'path': locationsElapsed1, 'bearing': -160.28}
+        );
 
-    getLocationsElapsed(
-      points, timeStampToFind2
-    ).should.deep.equal(
-      {'path': locationsElapsed2, 'bearing': -150.83}
-    );
+        getLocationsElapsed(
+            points, timeStampToFind2
+        ).should.deep.equal(
+            {'path': locationsElapsed2, 'bearing': -150.83}
+        );
 
-    getLocationsElapsed(
-      pointsWithDuplicates, timeStampForDuplicates
-    ).should.deep.equal(
-      {'path': locationsElapsedWithDuplicates, 'bearing': -150.83}
-    );
-  });
+        getLocationsElapsed(
+            pointsWithDuplicates, timeStampForDuplicates
+        ).should.deep.equal(
+            {'path': locationsElapsedWithDuplicates, 'bearing': -150.83}
+        );
+    });
+
+    it('creates polyline segments', function() {
+        getPolylineSegments(
+            ''
+        ).should.deep.equal(
+            {'path': [], 'bearing': null}
+        )
+    });
 });
 
 describe('#encoder', function() {
-  it('encodes polyline', function() {
-    encoder(points).should.equal(encoded);
-  });
+    it('encodes polyline', function() {
+        encoder(points).should.equal(encoded);
+    });
 });
