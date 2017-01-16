@@ -81,14 +81,16 @@ polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, tim
 * and gaps, which are dotted.
 */
 polyline.getPolylineSegmentsForLocationsElapsed = function(decodedTimeAwarePolyline, timeStamp) {
-    var polylineSegments = getPolylineSegments(decodedTimeAwarePolyline);
+    var polylineSegments = getPolylineSegments(decodedTimeAwarePolyline, timeStamp);
     var result = [];
 
     for (var i=0; i < polylineSegments.length; i++) {
-        var elapsed = polyline.getLocationsElapsedByTimestamp(polylineSegments[i], timeStamp);
+        var elapsed = polyline.getLocationsElapsedByTimestamp(polylineSegments[i].segment, timeStamp);
 
         if (elapsed.path.length > 0) {
-            result.push(elapsed);
+            result.push({
+                'path': elapsed.path, 'bearing': elapsed.bearing, 'style': polylineSegments[i].style
+            });
         }
     }
 
@@ -211,7 +213,7 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
     return {'locations': locationsElapsed, 'bearing': bearing};
 }
 
-function getPolylineSegments(decoded) {
+function getPolylineSegments(decoded, timeLimit) {
     // this method breaks polyline till timeStamp when
     // consecutive time difference is greater than 10 minutes
     var segments = [], currentSegment = [];
@@ -224,20 +226,29 @@ function getPolylineSegments(decoded) {
     var startTime = new Date(decoded[0][2]);
 
     for (index = 0; index < decoded.length; index++) {
-        var indexTime = new Date(decoded[index][2]);
-        var timeDiff = (indexTime - startTime);
+        if (decoded[index][2] <= timeLimit) {
+            var indexTime = new Date(decoded[index][2]);
+            var timeDiff = (indexTime - startTime);
 
-        if (timeDiff > 10 * 60 * 1000) {
-            // time difference is more than 10 mins, so flush
-            segments.push(currentSegment);
-            currentSegment = [];
+            if (timeDiff > 10 * 60 * 1000 && currentSegment.length > 0) {
+                // time difference is more than 10 mins, so flush
+                currentSegment.push(decoded[index]);
+                segments.push({
+                    'segment': currentSegment, 'style': 'dotted'
+                });
+                currentSegment = [];
+            }
+
+            currentSegment.push(decoded[index])
+            startTime = indexTime;
+        } else {
+            break;
         }
-
-        currentSegment.push(decoded[index])
-        startTime = indexTime;
     }
 
-    segments.push(currentSegment);
+    segments.push({
+        'segment': currentSegment, 'style': 'solid'
+    });
     return segments;
 }
 

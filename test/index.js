@@ -102,8 +102,8 @@ describe('#decoder', function() {
             pointsToSplit, '2016-07-21T05:55:09.000Z'
         ).should.deep.equal(
             [
-                {'path': [[19.13626, 72.92506]], 'bearing': 0},
-                {'path': [[19.13777, 72.92555], [19.13888, 72.92666]], 'bearing': 43.37}
+                {'path': [[19.13626, 72.92506], [19.13777, 72.92555]], 'bearing': 17.04, 'style': 'dotted'},
+                {'path': [[19.13777, 72.92555], [19.13888, 72.92666]], 'bearing': 43.37, 'style': 'solid'}
             ]
         );
 
@@ -111,7 +111,7 @@ describe('#decoder', function() {
             pointsToSplit, '2016-07-21T05:43:09.000Z'
         ).should.deep.equal(
             [
-                {'path': [[19.13626, 72.92506]], 'bearing': 0}
+                {'path': [[19.13626, 72.92506]], 'bearing': 0, 'style': 'solid'}
             ]
         )
     });
