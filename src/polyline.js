@@ -213,14 +213,23 @@ function getPolylineSegments(decoded, timeStampToFind) {
         return [];
     }
 
-    var startTime = decoded[0][2];
+    var startTime = new Date(decoded[0][2]);
 
     for (index = 0; index < decoded.length; index++) {
+        var indexTime = new Date(decoded[index][2]);
+        var timeDiff = (indexTime - startTime);
+
+        if (timeDiff > 10 * 60 * 1000) {
+            // time difference is more than 10 mins, so flush
+            segments.push(currentSegment);
+            currentSegment = [];
+        }
+
         currentSegment.push([decoded[index][0], decoded[index][1]])
-        segments.push(currentSegment);
-        currentSegment = [];
+        startTime = indexTime;
     }
 
+    segments.push(currentSegment);
     return segments;
 }
 
