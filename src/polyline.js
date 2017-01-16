@@ -209,6 +209,12 @@ function getPolylineSegments(decoded, timeStampToFind) {
     var segments = [], currentSegment = [];
     var index = 0;
 
+    if (decoded.length == 0) {
+        return [];
+    }
+
+    var startTime = decoded[0][2];
+
     for (index = 0; index < decoded.length; index++) {
         currentSegment.push([decoded[index][0], decoded[index][1]])
         segments.push(currentSegment);
@@ -240,85 +246,84 @@ function getLocationInPair(gpxPair, timeStamp) {
     endTime = new Date(gpxPair[1][2]),
     currentTime = new Date(timeStamp);
     var ratio = (startTime - currentTime) / (startTime - endTime);
-    return [startLat * (1 - ratio) + endLat * ratio,
-        startLng * (1 - ratio) + endLng * ratio];
-    }
+    return [startLat * (1 - ratio) + endLat * ratio, startLng * (1 - ratio) + endLng * ratio];
+}
 
-    function getNextLatLng(decoded, timeStamp) {
-        var polylineLength = decoded.length;
+function getNextLatLng(decoded, timeStamp) {
+    var polylineLength = decoded.length;
 
-        if (polylineLength > 0) {
-            for (var index = 0; index < polylineLength - 1; index++) {
-                var currentTimeStamp = decoded[index][2];
+    if (polylineLength > 0) {
+        for (var index = 0; index < polylineLength - 1; index++) {
+            var currentTimeStamp = decoded[index][2];
 
-                if (timeStamp < currentTimeStamp) {
-                    return [decoded[index][0], decoded[index][1]];
-                }
+            if (timeStamp < currentTimeStamp) {
+                return [decoded[index][0], decoded[index][1]];
             }
-
-            return [decoded[polylineLength - 1][0], decoded[polylineLength - 1][1]];
         }
+
+        return [decoded[polylineLength - 1][0], decoded[polylineLength - 1][1]];
     }
+}
 
-    function computeHeading(start, end) {
-        var lat1 = start[0]*Math.PI/180;
-        var lat2 = end[0]*Math.PI/180;
-        var lng1 = start[1]*Math.PI/180;
-        var lng2 = end[1]*Math.PI/180;
-        return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
-    }
+function computeHeading(start, end) {
+    var lat1 = start[0]*Math.PI/180;
+    var lat2 = end[0]*Math.PI/180;
+    var lng1 = start[1]*Math.PI/180;
+    var lng2 = end[1]*Math.PI/180;
+    return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
+}
 
-    function areEqualLatlngs(latlngA, latlngB) {
-        return (latlngA[0] == latlngB[0]) && (latlngA[1] == latlngB[1]);
-    }
+function areEqualLatlngs(latlngA, latlngB) {
+    return (latlngA[0] == latlngB[0]) && (latlngA[1] == latlngB[1]);
+}
 
-    // Methods to convert types
+// Methods to convert types
 
-    function getCoordinate(intRepresentation) {
-        var coordinate = intRepresentation * 0.00001;
-        return +coordinate.toFixed(5);
-    }
+function getCoordinate(intRepresentation) {
+    var coordinate = intRepresentation * 0.00001;
+    return +coordinate.toFixed(5);
+}
 
-    function getIsoTime(timeStamp) {
-        // timeStamp is in seconds
-        return new Date(timeStamp * 1000).toISOString();
-    }
+function getIsoTime(timeStamp) {
+    // timeStamp is in seconds
+    return new Date(timeStamp * 1000).toISOString();
+}
 
-    function getGpxLog(lat, lng, timeStamp) {
-        return [
-            getCoordinate(lat), getCoordinate(lng), getIsoTime(timeStamp)
-        ];
-    }
+function getGpxLog(lat, lng, timeStamp) {
+    return [
+        getCoordinate(lat), getCoordinate(lng), getIsoTime(timeStamp)
+    ];
+}
 
-    function getLat(gpxLog) {
-        return Math.round(gpxLog[0] * 100000);
-    }
+function getLat(gpxLog) {
+    return Math.round(gpxLog[0] * 100000);
+}
 
-    function getLng(gpxLog) {
-        return Math.round(gpxLog[1] * 100000);
-    }
+function getLng(gpxLog) {
+    return Math.round(gpxLog[1] * 100000);
+}
 
-    function getTimeStamp(gpxLog) {
-        return +new Date(gpxLog[2]) / 1000;
+function getTimeStamp(gpxLog) {
+    return +new Date(gpxLog[2]) / 1000;
 
-    }
+}
 
-    // Override bit wise operators to circumvent 64 bit int issue
+// Override bit wise operators to circumvent 64 bit int issue
 
-    function lshiftOperator(num, bits) {
-        // Custom left shift for 64 bit integers
-        return num * Math.pow(2, bits);
-    }
+function lshiftOperator(num, bits) {
+    // Custom left shift for 64 bit integers
+    return num * Math.pow(2, bits);
+}
 
-    function rshiftOperator(num, bits) {
-        // Custom right shift for 64 bit integers
-        return Math.floor(num / Math.pow(2, bits));
-    }
+function rshiftOperator(num, bits) {
+    // Custom right shift for 64 bit integers
+    return Math.floor(num / Math.pow(2, bits));
+}
 
-    function notOperator(num) {
-        // Custom not operator for 64 bit integers
-        return ~num;
-    }
+function notOperator(num) {
+    // Custom not operator for 64 bit integers
+    return ~num;
+}
 
 
-    module.exports = polyline
+module.exports = polyline
