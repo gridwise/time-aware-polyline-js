@@ -56,7 +56,12 @@ polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamp
     for (index = 0; index < timeStamps.length; index++) {
         var locationsAndBearing = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamps[index]);
         var locationsFound = locationsAndBearing.locations;
-        locations.push(locationsFound[locationsFound.length - 1]);
+
+        if (locationsFound.length > 0) {
+            locations.push(locationsFound[locationsFound.length - 1]);
+        } else {
+            locations.push([]);
+        }
     }
 
     return locations;
@@ -80,7 +85,11 @@ polyline.getPolylineSegmentsForLocationsElapsed = function(decodedTimeAwarePolyl
     var result = [];
 
     for (var i=0; i < polylineSegments.length; i++) {
-        result.push(polyline.getLocationsElapsedByTimestamp(polylineSegments[i], timeStamp))
+        var elapsed = polyline.getLocationsElapsedByTimestamp(polylineSegments[i], timeStamp);
+
+        if (elapsed.path.length > 0) {
+            result.push(elapsed);
+        }
     }
 
     return result;
@@ -168,8 +177,8 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
     // remove times before first time
     var timeStampToFind = timeStamp, startTime = decoded[0][2];
 
-    while (timeStampToFind <= startTime) {
-        return {'locations': [[decoded[0][0], decoded[0][1]]], 'bearing': bearing};
+    while (timeStampToFind < startTime) {
+        return {'locations': [], 'bearing': bearing};
     }
 
     for (index = 0; index < decoded.length; index++) {
@@ -224,7 +233,7 @@ function getPolylineSegments(decoded) {
             currentSegment = [];
         }
 
-        currentSegment.push([decoded[index][0], decoded[index][1]])
+        currentSegment.push(decoded[index])
         startTime = indexTime;
     }
 

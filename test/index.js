@@ -39,7 +39,7 @@ var locationsFound = [
     [19.13553, 72.92469],
     [19.136163333333336, 72.92502333333334],
     [19.13553, 72.92469],
-    [19.13626, 72.92506],
+    [],
 ];
 
 var timeStampToFind1 = timeStampsToFind[1];
@@ -104,6 +104,14 @@ describe('#decoder', function() {
             [
                 {'path': [[19.13626, 72.92506]], 'bearing': 0},
                 {'path': [[19.13777, 72.92555], [19.13888, 72.92666]], 'bearing': 43.37}
+            ]
+        );
+
+        getPolylineSegments(
+            pointsToSplit, '2016-07-21T05:43:09.000Z'
+        ).should.deep.equal(
+            [
+                {'path': [[19.13626, 72.92506]], 'bearing': 0}
             ]
         )
     });
