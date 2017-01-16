@@ -23,7 +23,7 @@ var pointsWithDuplicates = [
 var pointsToSplit = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
     [19.13777, 72.92555, '2016-07-21T05:54:09.000Z'],
-    [19.13777, 72.92555, '2016-07-21T05:55:09.000Z']
+    [19.13888, 72.92666, '2016-07-21T05:55:09.000Z']
 ];
 
 var encoded = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
@@ -99,11 +99,11 @@ describe('#decoder', function() {
 
     it('creates polyline segments', function() {
         getPolylineSegments(
-            pointsToSplit, null
+            pointsToSplit, '2016-07-21T05:55:09.000Z'
         ).should.deep.equal(
             [
-                {'path': [[19.13626, 72.92506]], 'bearing': null},
-                {'path': [[19.13777, 72.92555], [19.13777, 72.92555]], 'bearing': null}
+                {'path': [[19.13626, 72.92506]], 'bearing': 0},
+                {'path': [[19.13777, 72.92555], [19.13888, 72.92666]], 'bearing': 43.37}
             ]
         )
     });

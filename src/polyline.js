@@ -68,7 +68,6 @@ polyline.getLocationsAtTimestamps = function(decodedTimeAwarePolyline, timeStamp
 */
 polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, timeStamp) {
     var locationsAndBearing = getLocationsTillTimeStamp(decodedTimeAwarePolyline, timeStamp);
-
     return {'path': locationsAndBearing.locations, 'bearing': locationsAndBearing.bearing};
 }
 
@@ -77,11 +76,11 @@ polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, tim
 * and gaps, which are dotted.
 */
 polyline.getPolylineSegmentsForLocationsElapsed = function(decodedTimeAwarePolyline, timeStamp) {
-    var polylineSegments = getPolylineSegments(decodedTimeAwarePolyline, timeStamp);
+    var polylineSegments = getPolylineSegments(decodedTimeAwarePolyline);
     var result = [];
 
     for (var i=0; i < polylineSegments.length; i++) {
-        result.push({'path': polylineSegments[i], 'bearing': null})
+        result.push(polyline.getLocationsElapsedByTimestamp(polylineSegments[i], timeStamp))
     }
 
     return result;
@@ -200,10 +199,10 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
         locationsElapsed.push([currentPair[0][0], currentPair[0][1]]);
     }
 
-    return {'locations': [[decoded[index-1][0], decoded[index-1][1]]], 'bearing': bearing};
+    return {'locations': locationsElapsed, 'bearing': bearing};
 }
 
-function getPolylineSegments(decoded, timeStampToFind) {
+function getPolylineSegments(decoded) {
     // this method breaks polyline till timeStamp when
     // consecutive time difference is greater than 10 minutes
     var segments = [], currentSegment = [];
