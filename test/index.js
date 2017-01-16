@@ -4,7 +4,7 @@ decoder = polyline.decodeTimeAwarePolyline,
 encoder = polyline.encodeTimeAwarePolyline,
 locationFinder = polyline.getLocationsAtTimestamps,
 getLocationsElapsed = polyline.getLocationsElapsedByTimestamp,
-getPolylineSegments = polyline.getPolylineSegments;
+getPolylineSegments = polyline.getPolylineSegmentsForLocationsElapsed;
 
 var points = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
@@ -18,6 +18,11 @@ var pointsWithDuplicates = [
     [19.13553, 72.92469, '2016-07-21T05:43:21.000Z'],
     [19.13553, 72.92469, '2016-07-21T05:43:22.000Z'],
     [19.13553, 72.92469, '2016-07-21T05:43:23.000Z']
+];
+
+var pointsToSplit = [
+    [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
+    [19.13777, 72.92555, '2016-07-21T05:54:09.000Z']
 ];
 
 var encoded = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
@@ -93,9 +98,12 @@ describe('#decoder', function() {
 
     it('creates polyline segments', function() {
         getPolylineSegments(
-            ''
+            pointsToSplit, null
         ).should.deep.equal(
-            {'path': [], 'bearing': null}
+            [
+                {'path': [[19.13626, 72.92506]], 'bearing': null},
+                {'path': [[19.13777, 72.92555]], 'bearing': null}
+            ]
         )
     });
 });
