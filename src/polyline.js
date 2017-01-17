@@ -258,6 +258,11 @@ function getPolylineSegments(decoded, timeLimit) {
 
             start = decoded[index];
         } else {
+            // add one more location so that the locations elapsed
+            // method can find an interpolated midpoint
+            if (!isDifferentSegment(decoded[index], start)) {
+                currentSegment.push(decoded[index]);
+            }
             break;
         }
     }
