@@ -22,8 +22,8 @@ var pointsWithDuplicates = [
 
 var pointsToSplit = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
-    [19.13777, 72.92555, '2016-07-21T05:54:09.000Z'],
-    [19.13888, 72.92666, '2016-07-21T05:55:09.000Z']
+    [19.20000, 72.20000, '2016-07-21T05:54:09.000Z'],
+    [19.201, 72.201, '2016-07-21T05:55:09.000Z']
 ];
 
 var encoded = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
@@ -111,12 +111,12 @@ describe('#decoder', function() {
 
     it('creates polyline segments', function() {
         getPolylineSegments(
-            pointsToSplit, '2016-07-21T05:55:09.000Z'
+            pointsToSplit, '2016-07-21T05:57:09.000Z'
         ).should.deep.equal(
             [
                 {'path': [[19.13626, 72.92506]], 'bearing': 0, 'style': 'solid'},
-                {'path': [[19.13626, 72.92506], [19.13777, 72.92555]], 'bearing': 17.04, 'style': 'dotted'},
-                {'path': [[19.13777, 72.92555], [19.13888, 72.92666]], 'bearing': 43.37, 'style': 'solid'}
+                {'path': [[19.13626, 72.92506], [19.20000, 72.20000]], 'bearing': -84.56, 'style': 'dotted'},
+                {'path': [[19.20000, 72.20000], [19.201, 72.201]], 'bearing': 43.36, 'style': 'solid'}
             ]
         );
 
@@ -129,12 +129,21 @@ describe('#decoder', function() {
         );
 
         getPolylineSegments(
+            pointsToSplit, '2016-07-21T05:54:30.000Z'
+        ).should.deep.equal(
+            [
+                {'path': [[19.13626, 72.92506]], 'bearing': 0, 'style': 'solid'},
+                {'path': [[19.13626, 72.92506], [19.20000, 72.20000]], 'bearing': -84.56, 'style': 'dotted'},
+                // next point is a midpoint
+                {'path': [[19.20000, 72.20000], [19.20035, 72.20035]], 'bearing': 43.36, 'style': 'solid'}
+            ]
+        );
+
+        getPolylineSegments(
             segmentTest, '2017-01-16T07:56:04+00:00'
         ).should.deep.equal(
             [
-                {'path': [[19.04076, 73.00895], [19.04049, 73.00895]], 'bearing': 180, 'style': 'solid'},
-                {'path': [[19.04049, 73.00895], [19.04107, 73.00896]], 'bearing': 0.93, 'style': 'dotted'},
-                {'path': [[19.04107, 73.00896], [19.04099, 73.00969], [19.0415, 73.00972], [19.04185, 73.00974]], 'bearing': 3.09, 'style': 'solid'},
+                {'path': [[19.04076, 73.00895], [19.04049, 73.00895], [19.04107, 73.00896], [19.04099, 73.00969], [19.0415, 73.00972], [19.04185, 73.00974]], 'bearing': 3.09, 'style': 'solid'},
                 {'path': [[19.04185, 73.00974], [19.1038, 72.89738]], 'bearing': -59.72, 'style': 'dotted'},
                 {'path': [[19.1038, 72.89738], [19.10445, 72.89765], [19.1038, 72.89738]], 'bearing': -158.57, 'style': 'solid'}
             ]

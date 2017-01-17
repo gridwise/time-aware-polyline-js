@@ -9,6 +9,9 @@
 var polyline = {};
 
 
+var EARTH_RADIUS = 6371;
+
+
 /**
 * Encodes a time aware polyline
 */
@@ -213,6 +216,13 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
     return {'locations': locationsElapsed, 'bearing': bearing};
 }
 
+function isDifferentSegment(end, start) {
+    // function to determine whether a polyline
+    // segment split should happen
+    var distance = getDistance(start, end);
+    return distance > 500;
+}
+
 function getPolylineSegments(decoded, timeLimit) {
     // this method breaks polyline till timeStamp when
     // consecutive time difference is greater than 10 minutes
@@ -223,14 +233,12 @@ function getPolylineSegments(decoded, timeLimit) {
         return [];
     }
 
-    var startTime = new Date(decoded[0][2]);
+    var start = decoded[0];
 
     for (index = 0; index < decoded.length; index++) {
         if (decoded[index][2] <= timeLimit) {
-            var indexTime = new Date(decoded[index][2]);
-            var timeDiff = (indexTime - startTime);
 
-            if (timeDiff > 10 * 60 * 1000 && currentSegment.length > 0) {
+            if (isDifferentSegment(decoded[index], start) && currentSegment.length > 0) {
                 // time difference is more than 10 mins, so flush
                 segments.push({
                     'segment': currentSegment, 'style': 'solid'
@@ -248,8 +256,13 @@ function getPolylineSegments(decoded, timeLimit) {
                 currentSegment.push(decoded[index]);
             }
 
-            startTime = indexTime;
+            start = decoded[index];
         } else {
+            // add one more location so that the locations elapsed
+            // method can find an interpolated midpoint
+            if (!isDifferentSegment(decoded[index], start)) {
+                currentSegment.push(decoded[index]);
+            }
             break;
         }
     }
@@ -301,11 +314,30 @@ function getNextLatLng(decoded, timeStamp) {
     }
 }
 
+function getDistance(origin, destination) {
+    // return distance in meters
+    var lon1 = toRadian(origin[1]),
+        lat1 = toRadian(origin[0]),
+        lon2 = toRadian(destination[1]),
+        lat2 = toRadian(destination[0]);
+
+    var deltaLat = lat2 - lat1;
+    var deltaLon = lon2 - lon1;
+
+    var a = Math.pow(Math.sin(deltaLat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon/2), 2);
+    var c = 2 * Math.asin(Math.sqrt(a));
+    return c * EARTH_RADIUS * 1000;
+}
+
+function toRadian(degree) {
+    return degree*Math.PI/180;
+}
+
 function computeHeading(start, end) {
-    var lat1 = start[0]*Math.PI/180;
-    var lat2 = end[0]*Math.PI/180;
-    var lng1 = start[1]*Math.PI/180;
-    var lng2 = end[1]*Math.PI/180;
+    var lat1 = toRadian(start[0]);
+    var lat2 = toRadian(end[0]);
+    var lng1 = toRadian(start[1]);
+    var lng2 = toRadian(end[1]);
     return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
 }
 
