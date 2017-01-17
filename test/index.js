@@ -23,7 +23,7 @@ var pointsWithDuplicates = [
 var pointsToSplit = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
     [19.20000, 72.20000, '2016-07-21T05:54:09.000Z'],
-    [19.20001, 72.20001, '2016-07-21T05:55:09.000Z']
+    [19.201, 72.201, '2016-07-21T05:55:09.000Z']
 ];
 
 var encoded = 'spxsBsdb|Lymo`qvAx@TKvAr@K';
@@ -111,12 +111,12 @@ describe('#decoder', function() {
 
     it('creates polyline segments', function() {
         getPolylineSegments(
-            pointsToSplit, '2016-07-21T05:55:09.000Z'
+            pointsToSplit, '2016-07-21T05:57:09.000Z'
         ).should.deep.equal(
             [
                 {'path': [[19.13626, 72.92506]], 'bearing': 0, 'style': 'solid'},
                 {'path': [[19.13626, 72.92506], [19.20000, 72.20000]], 'bearing': -84.56, 'style': 'dotted'},
-                {'path': [[19.20000, 72.20000], [19.20001, 72.20001]], 'bearing': 43.36, 'style': 'solid'}
+                {'path': [[19.20000, 72.20000], [19.201, 72.201]], 'bearing': 43.36, 'style': 'solid'}
             ]
         );
 
@@ -125,6 +125,17 @@ describe('#decoder', function() {
         ).should.deep.equal(
             [
                 {'path': [[19.13626, 72.92506]], 'bearing': 0, 'style': 'solid'}
+            ]
+        );
+
+        getPolylineSegments(
+            pointsToSplit, '2016-07-21T05:54:30.000Z'
+        ).should.deep.equal(
+            [
+                {'path': [[19.13626, 72.92506]], 'bearing': 0, 'style': 'solid'},
+                {'path': [[19.13626, 72.92506], [19.20000, 72.20000]], 'bearing': -84.56, 'style': 'dotted'},
+                // next point is a midpoint
+                {'path': [[19.20000, 72.20000], [19.20035, 72.20035]], 'bearing': 43.36, 'style': 'solid'}
             ]
         );
 
