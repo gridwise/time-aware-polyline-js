@@ -213,6 +213,13 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
     return {'locations': locationsElapsed, 'bearing': bearing};
 }
 
+function isDifferentSegment(end, start) {
+    // function to determine whether a polyline
+    // segment split should happen
+    var endTime = new Date(end[2]), startTime = new Date(start[2]);
+    return (endTime - startTime) > 10 * 60 * 1000;
+}
+
 function getPolylineSegments(decoded, timeLimit) {
     // this method breaks polyline till timeStamp when
     // consecutive time difference is greater than 10 minutes
@@ -223,14 +230,12 @@ function getPolylineSegments(decoded, timeLimit) {
         return [];
     }
 
-    var startTime = new Date(decoded[0][2]);
+    var start = decoded[0];
 
     for (index = 0; index < decoded.length; index++) {
         if (decoded[index][2] <= timeLimit) {
-            var indexTime = new Date(decoded[index][2]);
-            var timeDiff = (indexTime - startTime);
 
-            if (timeDiff > 10 * 60 * 1000 && currentSegment.length > 0) {
+            if (isDifferentSegment(decoded[index], start) && currentSegment.length > 0) {
                 // time difference is more than 10 mins, so flush
                 segments.push({
                     'segment': currentSegment, 'style': 'solid'
@@ -248,7 +253,7 @@ function getPolylineSegments(decoded, timeLimit) {
                 currentSegment.push(decoded[index]);
             }
 
-            startTime = indexTime;
+            start = decoded[index];
         } else {
             break;
         }
