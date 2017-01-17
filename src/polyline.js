@@ -9,6 +9,9 @@
 var polyline = {};
 
 
+var EARTH_RADIUS = 6371;
+
+
 /**
 * Encodes a time aware polyline
 */
@@ -216,8 +219,8 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
 function isDifferentSegment(end, start) {
     // function to determine whether a polyline
     // segment split should happen
-    var endTime = new Date(end[2]), startTime = new Date(start[2]);
-    return (endTime - startTime) > 10 * 60 * 1000;
+    var distance = getDistance(start, end);
+    return distance > 500;
 }
 
 function getPolylineSegments(decoded, timeLimit) {
@@ -306,11 +309,30 @@ function getNextLatLng(decoded, timeStamp) {
     }
 }
 
+function getDistance(origin, destination) {
+    // return distance in meters
+    var lon1 = toRadian(origin[1]),
+        lat1 = toRadian(origin[0]),
+        lon2 = toRadian(destination[1]),
+        lat2 = toRadian(destination[0]);
+
+    var deltaLat = lat2 - lat1;
+    var deltaLon = lon2 - lon1;
+
+    var a = Math.pow(Math.sin(deltaLat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon/2), 2);
+    var c = 2 * Math.asin(Math.sqrt(a));
+    return c * EARTH_RADIUS * 1000;
+}
+
+function toRadian(degree) {
+    return degree*Math.PI/180;
+}
+
 function computeHeading(start, end) {
-    var lat1 = start[0]*Math.PI/180;
-    var lat2 = end[0]*Math.PI/180;
-    var lng1 = start[1]*Math.PI/180;
-    var lng2 = end[1]*Math.PI/180;
+    var lat1 = toRadian(start[0]);
+    var lat2 = toRadian(end[0]);
+    var lng1 = toRadian(start[1]);
+    var lng2 = toRadian(end[1]);
     return Math.atan2( Math.sin(lng2-lng1) * Math.cos(lat2), Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(lng2-lng1))*180/Math.PI;
 }
 
