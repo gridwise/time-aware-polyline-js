@@ -80,6 +80,21 @@ polyline.getLocationsElapsedByTimestamp = function(decodedTimeAwarePolyline, tim
 }
 
 /**
+* Cut a decoded time aware polyline into segments
+*/
+polyline.getPolylineSegments = function(decodedTimeAwarePolyline) {
+    var lastTimeStamp = decodedTimeAwarePolyline[decodedTimeAwarePolyline.length - 1][2]
+    var polylineSegments = getPolylineSegments(decodedTimeAwarePolyline, lastTimeStamp);
+    var result = [];
+
+    for (var i=0; i < polylineSegments.length; i++) {
+        result.push({'path': removeTimeStamps(polylineSegments[i].segment), 'style': polylineSegments[i].style});
+    }
+
+    return result;
+}
+
+/**
 * Decode a polyline into segments of contiguous location data, which are solid,
 * and gaps, which are dotted.
 */
@@ -347,6 +362,14 @@ function computeHeading(start, end) {
 
 function areEqualLatlngs(latlngA, latlngB) {
     return (latlngA[0] == latlngB[0]) && (latlngA[1] == latlngB[1]);
+}
+
+function removeTimeStamps(segment) {
+    var result = [];
+    for (var i = 0; i < segment.length; i++) {
+        result.push([segment[i][0], segment[i][1]]);
+    }
+    return result;
 }
 
 // Methods to convert types

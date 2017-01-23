@@ -4,7 +4,8 @@ decoder = polyline.decodeTimeAwarePolyline,
 encoder = polyline.encodeTimeAwarePolyline,
 locationFinder = polyline.getLocationsAtTimestamps,
 getLocationsElapsed = polyline.getLocationsElapsedByTimestamp,
-getPolylineSegments = polyline.getPolylineSegmentsForLocationsElapsed;
+getPolylineSegments = polyline.getPolylineSegments,
+getPolylineSegmentsAtTime = polyline.getPolylineSegmentsForLocationsElapsed;
 
 var points = [
     [19.13626, 72.92506, '2016-07-21T05:43:09.000Z'],
@@ -119,7 +120,7 @@ describe('#decoder', function() {
     });
 
     it('creates polyline segments', function() {
-        getPolylineSegments(
+        getPolylineSegmentsAtTime(
             pointsToSplit, '2016-07-21T05:57:09.000Z'
         ).should.deep.equal(
             [
@@ -129,7 +130,7 @@ describe('#decoder', function() {
             ]
         );
 
-        getPolylineSegments(
+        getPolylineSegmentsAtTime(
             pointsToSplit, '2016-07-21T05:43:09.000Z'
         ).should.deep.equal(
             [
@@ -137,7 +138,7 @@ describe('#decoder', function() {
             ]
         );
 
-        getPolylineSegments(
+        getPolylineSegmentsAtTime(
             pointsToSplit, '2016-07-21T05:54:30.000Z'
         ).should.deep.equal(
             [
@@ -148,7 +149,7 @@ describe('#decoder', function() {
             ]
         );
 
-        getPolylineSegments(
+        getPolylineSegmentsAtTime(
             segmentTest, '2017-01-16T07:56:04+00:00'
         ).should.deep.equal(
             [
@@ -158,6 +159,18 @@ describe('#decoder', function() {
             ]
         );
     });
+
+    it('polyline segments after completion', function() {
+        getPolylineSegments(
+            pointsToSplit
+        ).should.deep.equal(
+            [
+                {'path': [[19.13626, 72.92506]], 'style': 'solid'},
+                {'path': [[19.13626, 72.92506], [19.20000, 72.20000]], 'style': 'dotted'},
+                {'path': [[19.20000, 72.20000], [19.201, 72.201]], 'style': 'solid'}
+            ]
+        )
+    })
 
     it('decodes complicated polyline', function() {
         var decoded = decoder(complicatedPolyline);
