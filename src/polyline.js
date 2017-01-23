@@ -179,11 +179,15 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
     var locationsElapsed = [];
     var bearing = 0;
 
+    if (decoded.length == 0) {
+        return {'locations': [], 'bearing': bearing};
+    }
+
     // remove times before first time
     var timeStampToFind = timeStamp, startTime = decoded[0][2];
 
-    while (timeStampToFind < startTime) {
-        return {'locations': [], 'bearing': bearing};
+    while (timeStampToFind <= startTime) {
+        return {'locations': [[decoded[0][0], decoded[0][1]]], 'bearing': bearing};
     }
 
     for (index = 0; index < decoded.length; index++) {
@@ -195,7 +199,7 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
 
             var startTime = currentPair[0][2], endTime = currentPair[1][2];
 
-            if (timeStampToFind >= startTime && timeStampToFind <= endTime) {
+            if (timeStampToFind > startTime && timeStampToFind <= endTime) {
                 // location is in the current pair
                 var midLocation = getLocationInPair(currentPair, timeStampToFind);
                 locationsElapsed.push(midLocation);
