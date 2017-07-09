@@ -235,6 +235,8 @@ function getLocationsTillTimeStamp(decodedPolyline, timeStamp) {
     return {'locations': locationsElapsed, 'bearing': bearing};
 }
 
+polyline.getLocationsTillTimeStamp = getLocationsTillTimeStamp;
+
 function isDifferentSegment(end, start) {
     // function to determine whether a polyline
     // segment split should happen
@@ -313,8 +315,9 @@ function getLocationInPair(gpxPair, timeStamp) {
     startTime = new Date(gpxPair[0][2]),
     endTime = new Date(gpxPair[1][2]),
     currentTime = new Date(timeStamp);
-    var ratio = (startTime - currentTime) / (startTime - endTime);
-    return [startLat * (1 - ratio) + endLat * ratio, startLng * (1 - ratio) + endLng * ratio];
+    var gap = (startTime - endTime);
+    var ratio = (startTime - currentTime) / gap;
+    return gap == 0 ? [endLat, endLat] : [startLat * (1 - ratio) + endLat * ratio, startLng * (1 - ratio) + endLng * ratio];
 }
 
 function getNextLatLng(decoded, timeStamp) {
